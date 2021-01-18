@@ -65,23 +65,24 @@ def longitud(img,alto,ancho):
 # C = 11
 # D = 4
 # E = 13
-archivo = str(11)
+tipos = {"A": "5", "B": "7", "C": "11", "D": "4", "E": "13"}
+tipo = "A"
 
 # Función de clasificación
-def clasifica(archivo):
+def clasifica(tipo):
     #Declación de variable internas
-    j = 10
     fail = 0
     tallo = 0
+    j = 10
     # Loop buscas las imagen para la clasificación
     while True:
         # Carga y preprocesado
         numero = str(j)
-        img = imread('l'+archivo+'nr0'+numero+'.tif')
+        img = imread('Archivos/hojasvegetales/leaf' + tipo + '/l' + tipos[tipo] + 'nr0' + numero + '.tif')
         gray = rgb2gray(img)
         binary = gray > 0.85
         alto,ancho = binary.shape
-        grupo = 0
+        grupo = "-"
         # Primer parametro para divisicón de subgrupos
         pripunto = int(alto*3/4)
         grosor = anchura(binary,ancho,pripunto)
@@ -110,10 +111,10 @@ def clasifica(archivo):
             tallo = segpunto-terpunto
 
             if tallo >= 650:
-                grupo = 5
+                grupo = "E"
             elif tallo < 650:
-                grupo = 1
-        # Clasificación subgrupo B
+                grupo = "A"
+        # Clasificación subgrupo 2
         elif grosor > 30:
             # Calculo de parametro
             segpunto = int(alto/2)
@@ -125,39 +126,40 @@ def clasifica(archivo):
             razon2 = grosor3/largo*100
             # Clasicación tipo D, con comportamiento creciente
             if razon2 > razon:
-                grupo = 4
+                grupo = "D"
             # Clasificación tipo C por relación ancho-largo,, y comportamiento decreciente
             elif razon > 30 and razon > razon2:
-                grupo = 3
+                grupo = "C"
                 total = np.sum(binary==False)
                 por = total/(alto*ancho)*100
                 # Excepciones para corregir elementos confusos tipo D
                 if por < 36:
-                    grupo = 4
+                    grupo = "D"
                 cuapunto = int(alto*7/16)
                 grosor4 = anchura(binary,ancho,cuapunto)
                 dif = abs(grosor2-grosor4)
                 if dif >= 65:
-                    grupo = 4
+                    grupo = "D"
             # Claficación hojas tipo B por relación ancho-largo
             elif razon < 18 and razon > razon2:
-                grupo = 2
+                grupo = "B"
             else:
-                grupo = 4
+                grupo = "D"
                 
         
-        if grupo != 3:
+        if grupo != tipo:
             
-            print(j,grupo)
+            print(j, grupo)
             fail = fail+1
             
-        if j == 75:
+        if numero == "19": #En el original, era '75'
             break
         j = j+1
     
     return fail
 
-fallos = clasifica(archivo)    
+fallos = clasifica(tipo)
+print("Fallos:", fallos)
 
     
 
